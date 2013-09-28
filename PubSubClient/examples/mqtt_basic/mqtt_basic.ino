@@ -6,26 +6,41 @@
   - subscribes to the topic "inTopic"
 */
 
-#include <SPI.h>
-#include <Ethernet.h>
-#include <PubSubClient.h>
+#include <Bridge.h>
+#include "PubSubClient.h"
 
 // Update these with values suitable for your network.
-byte mac[]    = {  0xDE, 0xED, 0xBA, 0xFE, 0xFE, 0xED };
-byte server[] = { 172, 16, 0, 2 };
-byte ip[]     = { 172, 16, 0, 100 };
+char * server = "192.168.0.2";
+
+int ledPin = 13;
 
 void callback(char* topic, byte* payload, unsigned int length) {
   // handle message arrived
+  char incomingByte = payload[0];
+  
+  if (incomingByte == 'H') {
+    digitalWrite(ledPin, HIGH);
+  }
+  
+  if (incomingByte == 'L') {
+    digitalWrite(ledPin, LOW);
+  }
+  
 }
 
-EthernetClient ethClient;
-PubSubClient client(server, 1883, callback, ethClient);
+PubSubClient client(server, "1883", callback);
 
 void setup()
 {
-  Ethernet.begin(mac, ip);
-  if (client.connect("arduinoClient")) {
+  
+  pinMode(ledPin, OUTPUT);
+  
+  Bridge.begin();
+  
+  digitalWrite(ledPin, HIGH);
+  
+  if (client.connect("a")) {
+      
     client.publish("outTopic","hello world");
     client.subscribe("inTopic");
   }

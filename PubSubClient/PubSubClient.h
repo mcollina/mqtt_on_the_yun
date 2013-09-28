@@ -2,13 +2,17 @@
  PubSubClient.h - A simple client for MQTT.
   Nicholas O'Leary
   http://knolleary.net
+
+  Matteo Collina
+  http://matteocollina.com
 */
 
 #ifndef PubSubClient_h
 #define PubSubClient_h
 
 #include <Arduino.h>
-#include "Client.h"
+#include <Process.h>
+#include <Bridge.h>
 
 // MQTT_MAX_PACKET_SIZE : Maximum packet size
 #define MQTT_MAX_PACKET_SIZE 128
@@ -39,7 +43,7 @@
 
 class PubSubClient {
 private:
-   Client* _client;
+   Process _process;
    uint8_t buffer[MQTT_MAX_PACKET_SIZE];
    uint16_t nextMsgId;
    unsigned long lastOutActivity;
@@ -50,13 +54,12 @@ private:
    uint8_t readByte();
    boolean write(uint8_t header, uint8_t* buf, uint16_t length);
    uint16_t writeString(char* string, uint8_t* buf, uint16_t pos);
-   uint8_t *ip;
+   void launchProcess();
    char* domain;
-   uint16_t port;
+   char* port;
 public:
    PubSubClient();
-   PubSubClient(uint8_t *, uint16_t, void(*)(char*,uint8_t*,unsigned int),Client& client);
-   PubSubClient(char*, uint16_t, void(*)(char*,uint8_t*,unsigned int),Client& client);
+   PubSubClient(char*, char*, void(*)(char*,uint8_t*,unsigned int));
    boolean connect(char *);
    boolean connect(char *, char *, char *);
    boolean connect(char *, char *, uint8_t, uint8_t, char *);
